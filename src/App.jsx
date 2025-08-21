@@ -551,4 +551,87 @@ export default function App(){
         </div>
         <p>Total Marks (4 for correct, -{negative} for wrong): <b>{t.totalMarks}</b> • Accuracy: <b>{t.accuracy}%</b></p>
         <table style={{marginTop:8}}>
-          <thead><tr><th>Subject</th><th>Correct</th><th>Wrong</th><th>Unattempted</th></tr>
+          <thead><tr><th>Subject</th><th>Correct</th><th>Wrong</th><th>Unattempted</th></tr></thead>
+‎          <tbody>
+‎            {Object.entries(sub).map(([k,v]) => (
+‎              <tr key={k}><td>{k}</td><td>{v.correct}</td><td>{v.wrong}</td><td>{v.unattempted}</td></tr>
+‎            ))}
+‎          </tbody>
+‎        </table>
+‎        <div style={{display:'flex', gap:8, marginTop:10}}>
+‎          <button className="btn" onClick={exportCSV}>Export CSV</button>
+‎          <button className="btn ghost" onClick={()=>setShowReview(false)}>Hide Review</button>
+‎        </div>
+‎        <div style={{marginTop:16}}>
+‎          {Array.from({length:TOTAL_Q},(_,i)=>i+1).map(q => <ReviewBlock key={q} qnum={q}/>)}
+‎        </div>
+‎      </div>
+‎    )
+‎  }
+‎
+‎  function HistoryPanel(){
+‎    const me = profiles[profileName] || { attempts: [] }
+‎    return (
+‎      <div className="card" style={{marginTop:16}}>
+‎        <h2>My Results {profileName ? `— ${profileName}` : ''}</h2>
+‎        {me.attempts.length===0 ? (
+‎          <div className="small">No attempts saved yet. Start a test and submit to see history here.</div>
+‎        ) : (
+‎          <table>
+‎            <thead>
+‎              <tr>
+‎                <th>Date</th><th>Score</th><th>Accuracy</th>
+‎                <th>Phy</th><th>Chem</th><th>Bot</th><th>Zoo</th>
+‎                <th>Duration</th><th>Neg</th>
+‎              </tr>
+‎            </thead>
+‎            <tbody>
+‎              {me.attempts.map((a,idx) => {
+‎                const d = new Date(a.date)
+‎                const sub = a.perSubject
+‎                return (
+‎                  <tr key={idx}>
+‎                    <td>{d.toLocaleString()}</td>
+‎                    <td>{a.totals.totalMarks}</td>
+‎                    <td>{a.totals.accuracy}%</td>
+‎                    <td>{sub.Physics.correct}</td>
+‎                    <td>{sub.Chemistry.correct}</td>
+‎                    <td>{sub.Botany.correct}</td>
+‎                    <td>{sub.Zoology.correct}</td>
+‎                    <td>{a.durationMin}m</td>
+‎                    <td>-{a.negative}</td>
+‎                  </tr>
+‎                )
+‎              })}
+‎            </tbody>
+‎          </table>
+‎        )}
+‎      </div>
+‎    )
+‎  }
+‎
+‎  return (
+‎    <div className="container">
+‎      <TopBar/>
+‎      <ProfileCard/>
+‎      <UploadCard/>
+‎      <SettingsCard/>
+‎
+‎      {state.started ? (
+‎        <div className="row" style={{marginTop:16}}>
+‎          <QuestionPane/>
+‎          <Navigator/>
+‎        </div>
+‎      ) : (
+‎        <div className="card" style={{marginTop:16}}>
+‎          <div className="small">When you click <b>Start Test</b>, the timer will begin and your answers will autosave.</div>
+‎        </div>
+‎      )}
+‎
+‎      {showReview && <ReviewPanel/>}
+‎      <HistoryPanel/>
+‎
+‎      <div className="footer">Built for you — offline-ready ● Supports TXT & PDF ● Stores profile & history locally</div>
+‎    </div>
+‎  )
+‎}
